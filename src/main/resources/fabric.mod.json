@@ -22,13 +22,6 @@
 			}
 		]
 	},
-	"mixins_DISABLE": [
-		"wasmtriggers.mixins.json",
-		{
-			"config": "wasmtriggers.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": ">=0.19.2",
 		"minecraft": "~1.21.11",
