@@ -38,6 +38,12 @@ dependencies {
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 	modImplementation("net.fabricmc:fabric-language-kotlin:${providers.gradleProperty("fabric_kotlin_version").get()}")
 	implementation("com.dylibso.chicory:runtime:1.7.5")
+	include("com.dylibso.chicory:runtime:1.7.5")
+	implementation("com.dylibso.chicory:wasm:1.7.5")
+	include("com.dylibso.chicory:wasm:1.7.5")
+	implementation("com.dylibso.chicory:wasi:1.7.5")
+	include("com.dylibso.chicory:wasi:1.7.5")
+	include("com.dylibso.chicory:log:1.7.5")
 }
 
 tasks.processResources {
