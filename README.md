@@ -1,9 +1,10 @@
 # WasmTriggers
 
-## Setup
+WasmTriggers is a minecraft modding framework which allows for mods to be written using WebAssembly,
 
-For setup instructions, please see the [Fabric Documentation page](https://docs.fabricmc.net/develop/getting-started/creating-a-project#setting-up) related to the IDE that you are using.
+## goals
+- create a generic api for WebAssembly programs to interact with minecraft in a convenient way
+- create language wrappers to allow for modding in different languages
 
-## License
-
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+## implementations
+currently there is only one [implementation in rust](https://github.com/EvelynTheSilly/wasmtriggers-rs), however others are planned 
