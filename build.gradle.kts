@@ -28,6 +28,8 @@ loom {
 	}
 }
 
+val chicoryVersion = "1.7.5"
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
@@ -37,13 +39,14 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 	modImplementation("net.fabricmc:fabric-language-kotlin:${providers.gradleProperty("fabric_kotlin_version").get()}")
-	implementation("com.dylibso.chicory:runtime:1.7.5")
-	include("com.dylibso.chicory:runtime:1.7.5")
-	implementation("com.dylibso.chicory:wasm:1.7.5")
-	include("com.dylibso.chicory:wasm:1.7.5")
-	implementation("com.dylibso.chicory:wasi:1.7.5")
-	include("com.dylibso.chicory:wasi:1.7.5")
-	include("com.dylibso.chicory:log:1.7.5")
+	implementation("com.dylibso.chicory:runtime:$chicoryVersion")
+	include("com.dylibso.chicory:runtime:$chicoryVersion")
+	implementation("com.dylibso.chicory:wasm:$chicoryVersion")
+	include("com.dylibso.chicory:wasm:$chicoryVersion")
+	implementation("com.dylibso.chicory:wasi:$chicoryVersion")
+	include("com.dylibso.chicory:wasi:$chicoryVersion")
+	include("com.dylibso.chicory:log:$chicoryVersion")
+
 }
 
 tasks.processResources {
