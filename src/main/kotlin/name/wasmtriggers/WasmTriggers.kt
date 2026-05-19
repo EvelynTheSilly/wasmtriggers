@@ -1,13 +1,10 @@
 package name.wasmtriggers
 
-import com.dylibso.chicory.wasm.UnlinkableException
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
 import net.fabricmc.loader.api.FabricLoader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.nio.file.Files
-import kotlin.io.path.name
-import kotlin.io.path.nameWithoutExtension
 
 object WasmTriggers : ClientModInitializer {
 	const val MOD_ID = "wasmtriggers"
@@ -20,20 +17,14 @@ object WasmTriggers : ClientModInitializer {
 		val wasmDir = baseDir.resolve("wasmtriggers")
 		logger.info("grabbing modules from $wasmDir")
 
-		Files.list(wasmDir).use { stream -> stream.forEach {
-			if (!it.name.endsWith(".wasm")){
-				logger.warn("file ${it.name} isn't a wasm file, despite being in the wasm directory")
-				return@forEach
+		modules = loadModulesFolder(wasmDir)
+
+		ServerMessageEvents.CHAT_MESSAGE.register { message, player, bound ->
+			val text = message.decoratedContent().string;
+			for (module in modules){
+				module.runChatMessageHandler(text)
 			}
-			logger.info("importing ${it.name}")
-			try {
-				modules.add(WasmModule.fromFile(it.toFile(), it.nameWithoutExtension))
-			} catch (e: UnlinkableException){
-				logger.error("could not link ${e.message}")
-				return@forEach
-            }
-			logger.info("imported ${it.name}")
-		} }
+		 }
 
 		for (module in modules){
 			module.runInitFunction()

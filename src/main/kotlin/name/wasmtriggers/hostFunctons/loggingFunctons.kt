@@ -4,11 +4,7 @@ import com.dylibso.chicory.runtime.HostFunction
 import com.dylibso.chicory.runtime.Instance
 import com.dylibso.chicory.wasm.types.FunctionType
 import com.dylibso.chicory.wasm.types.ValType
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-val logger: Logger = LoggerFactory.getLogger("WasmTriggersLogging")
-
+import name.wasmtriggers.WasmTriggers
 
 fun getLoggingFunctions(): Array<HostFunction> {
     val debug = HostFunction(
@@ -25,7 +21,7 @@ fun getLoggingFunctions(): Array<HostFunction> {
 
         val message = instance.memory().readString(offset, len)
 
-        logger.debug(message)
+        WasmTriggers.logger.debug(message)
 
         null
     }
@@ -43,7 +39,7 @@ fun getLoggingFunctions(): Array<HostFunction> {
 
         val message = instance.memory().readString(offset, len)
 
-        logger.info(message)
+        WasmTriggers.logger.info(message)
 
         null
     }
@@ -61,7 +57,7 @@ fun getLoggingFunctions(): Array<HostFunction> {
 
         val message = instance.memory().readString(offset, len)
 
-        logger.warn(message)
+        WasmTriggers.logger.warn(message)
 
         null
     }
@@ -80,7 +76,7 @@ fun getLoggingFunctions(): Array<HostFunction> {
 
         val message = instance.memory().readString(offset, len)
 
-        logger.error(message)
+        WasmTriggers.logger.error(message)
 
         null
     }

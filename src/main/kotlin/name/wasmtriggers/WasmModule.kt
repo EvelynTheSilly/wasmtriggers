@@ -7,14 +7,16 @@ import com.dylibso.chicory.wasi.WasiOptions
 import com.dylibso.chicory.runtime.Store
 import com.dylibso.chicory.wasi.WasiPreview1
 import com.dylibso.chicory.wasm.InvalidException
+import com.dylibso.chicory.wasm.UnlinkableException
 import name.wasmtriggers.hostFunctons.getLoggingFunctions
-import name.wasmtriggers.hostFunctons.logger
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
+import kotlin.use
 
 class WasmModule(val instance: Instance, val name: String) {
-    val logger: Logger = LoggerFactory.getLogger("WasmModule")
     companion object{
         fun fromInstance(instance: Instance, name: String): WasmModule {
             return WasmModule(instance, name)
@@ -31,7 +33,7 @@ class WasmModule(val instance: Instance, val name: String) {
                 store.addFunction(func)
             }
             for (func in getLoggingFunctions()){
-                logger.info("registering ${func.module()} ${func.name()}")
+                WasmTriggers.logger.info("registering ${func.module()} ${func.name()}")
                 store.addFunction(func)
             }
 
@@ -44,17 +46,53 @@ class WasmModule(val instance: Instance, val name: String) {
         return try {
             instance.export(name)
         }catch (e: InvalidException){
-            logger.info("$e")
+            WasmTriggers.logger.info("$e")
             null
         }
     }
     fun runInitFunction() {
-        logger.info("initialising ${this.name}")
+        WasmTriggers.logger.info("initialising ${this.name}")
         val function = this.wasmFunction("init_handler")
         if (function == null) {
-            logger.warn("module has no init_handler")
+            WasmTriggers.logger.warn("module has no init_handler")
             return
         }
         function.apply()
     }
+    fun runChatMessageHandler(message: String){
+        val chatMessageHandler = wasmFunction("chat_message_handler")
+        if (chatMessageHandler != null){
+            val alloc = wasmFunction("alloc")!!
+            val free = wasmFunction("dealloc")!!
+            val len = message.toByteArray().size.toLong()
+            val ptr = alloc.apply(len)[0]
+            if (ptr == 0L) {
+                // validate nonnull ptr
+                return
+            }
+            this.instance.memory().writeString(ptr.toInt(), message)
+            chatMessageHandler.apply(ptr, len)
+            free.apply(ptr, len)
+        }
+
+    }
+}
+
+fun loadModulesFolder(folder: Path): MutableList<WasmModule> {
+    val modules = mutableListOf<WasmModule>()
+    Files.list(folder).use { stream -> stream.forEach {
+        if (!it.name.endsWith(".wasm")){
+            WasmTriggers.logger.warn("file ${it.name} isn't a wasm file, despite being in the wasm directory")
+            return@forEach
+        }
+        WasmTriggers.logger.info("importing ${it.name}")
+        try {
+            modules.add(WasmModule.fromFile(it.toFile(), it.nameWithoutExtension))
+        } catch (e: UnlinkableException){
+            WasmTriggers.logger.error("could not link ${e.message}")
+            return@forEach
+        }
+        WasmTriggers.logger.info("imported ${it.name}")
+    } }
+    return modules
 }
