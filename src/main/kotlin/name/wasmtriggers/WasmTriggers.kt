@@ -22,7 +22,7 @@ object WasmTriggers : ClientModInitializer {
 		ServerMessageEvents.CHAT_MESSAGE.register { message, player, bound ->
 			val text = message.decoratedContent().string;
 			for (module in modules){
-				module.runChatMessageHandler(text)
+				module.runChatMessageHandler(player.plainTextName,text)
 			}
 		 }
 

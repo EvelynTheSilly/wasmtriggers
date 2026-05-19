@@ -50,6 +50,22 @@ class WasmModule(val instance: Instance, val name: String) {
             null
         }
     }
+
+    /**
+     * allocates a string on the memory and returns a pointer and length
+     * freeing string is the responsibility of the caller
+     */
+    fun allocateString(string: String): Pair<Long,Long>? {
+        val alloc = wasmFunction("alloc")!!
+        val len = string.toByteArray().size.toLong()
+        val ptr = alloc.apply(len)[0]
+        if (ptr == 0L) {
+            // validate nonnull ptr
+            return null
+        }
+        this.instance.memory().writeString(ptr.toInt(), string)
+        return Pair(ptr, len)
+    }
     fun runInitFunction() {
         WasmTriggers.logger.info("initialising ${this.name}")
         val function = this.wasmFunction("init_handler")
@@ -59,20 +75,20 @@ class WasmModule(val instance: Instance, val name: String) {
         }
         function.apply()
     }
-    fun runChatMessageHandler(message: String){
+    fun runChatMessageHandler(playerName: String, message: String){
         val chatMessageHandler = wasmFunction("chat_message_handler")
         if (chatMessageHandler != null){
-            val alloc = wasmFunction("alloc")!!
-            val free = wasmFunction("dealloc")!!
-            val len = message.toByteArray().size.toLong()
-            val ptr = alloc.apply(len)[0]
-            if (ptr == 0L) {
-                // validate nonnull ptr
+            val playerPtrLen = this.allocateString(playerName)
+            val messagePtrLen = this.allocateString(message)
+            if (playerPtrLen == null || messagePtrLen == null){
                 return
             }
-            this.instance.memory().writeString(ptr.toInt(), message)
-            chatMessageHandler.apply(ptr, len)
-            free.apply(ptr, len)
+            chatMessageHandler.apply(
+                playerPtrLen.first,
+                playerPtrLen.second,
+                messagePtrLen.first,
+                messagePtrLen.second
+            )
         }
 
     }
