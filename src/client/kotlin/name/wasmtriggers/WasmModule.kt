@@ -30,12 +30,12 @@ class WasmModule(val instance: Instance, val name: String) {
 
             val store = Store()
 
-            val hostfunctions = getLoggingFunctions() + getChatFunctions()
+            val hostFunctions = getLoggingFunctions() + getChatFunctions()
 
             for (func in wasi.toHostFunctions()){
                 store.addFunction(func)
             }
-            for (func in hostfunctions){
+            for (func in hostFunctions){
                 WasmTriggers.logger.info("registering ${func.module()} ${func.name()}")
                 store.addFunction(func)
             }
