@@ -28,6 +28,15 @@ object WasmTriggers : ClientModInitializer {
 				}
 			}
 		}
+		ClientReceiveMessageEvents.GAME.register { component, bool ->
+			if (bool) {
+				return@register
+			}
+			val text = component.string;
+			for (module in modules){
+				module.runServerMessageHandler(text)
+			}
+		}
 
 		for (module in modules){
 			module.runInitFunction()

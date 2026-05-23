@@ -59,7 +59,7 @@ class WasmModule(val instance: Instance, val name: String) {
      * allocates a string on the memory and returns a pointer and length
      * freeing string is the responsibility of the caller
      */
-    fun allocateString(string: String): Pair<Long,Long>? {
+    fun allocateString(string: String): LongArray? {
         val alloc = wasmFunction("alloc")!!
         val len = string.toByteArray().size.toLong()
         val ptr = alloc.apply(len)[0]
@@ -68,7 +68,7 @@ class WasmModule(val instance: Instance, val name: String) {
             return null
         }
         this.instance.memory().writeString(ptr.toInt(), string)
-        return Pair(ptr, len)
+        return longArrayOf(ptr, len)
     }
     fun runInitFunction() {
         WasmTriggers.logger.info("initialising ${this.name}")
@@ -80,21 +80,20 @@ class WasmModule(val instance: Instance, val name: String) {
         function.apply()
     }
     fun runChatMessageHandler(playerName: String, message: String){
-        val chatMessageHandler = wasmFunction("chat_message_handler")
-        if (chatMessageHandler != null){
-            val playerPtrLen = this.allocateString(playerName)
-            val messagePtrLen = this.allocateString(message)
-            if (playerPtrLen == null || messagePtrLen == null){
-                return
-            }
-            chatMessageHandler.apply(
-                playerPtrLen.first,
-                playerPtrLen.second,
-                messagePtrLen.first,
-                messagePtrLen.second
-            )
-        }
-
+        val chatMessageHandler = wasmFunction("chat_message_handler") ?: return
+        val playerName = this.allocateString(playerName) ?: return
+        val message = this.allocateString(message) ?: return
+        chatMessageHandler.apply(
+            *playerName,
+            *message,
+        )
+    }
+    fun runServerMessageHandler(message: String){
+        val serverMessageHandler = wasmFunction("server_message_handler") ?: return
+        val message = this.allocateString(message) ?: return
+        serverMessageHandler.apply(
+            *message,
+        )
     }
 }
 
