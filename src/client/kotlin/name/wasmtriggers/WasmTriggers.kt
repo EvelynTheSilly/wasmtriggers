@@ -1,6 +1,7 @@
 package name.wasmtriggers
 
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
 import net.fabricmc.loader.api.FabricLoader
 import org.slf4j.Logger
@@ -19,12 +20,14 @@ object WasmTriggers : ClientModInitializer {
 
 		modules = loadModulesFolder(wasmDir)
 
-		ServerMessageEvents.CHAT_MESSAGE.register { message, player, bound ->
-			val text = message.decoratedContent().string;
+		ClientReceiveMessageEvents.CHAT.register { component, message, profile, bound, instant ->
+			val text = message?.decoratedContent()?.string;
 			for (module in modules){
-				module.runChatMessageHandler(player.plainTextName,text)
+				if (text != null) {
+					module.runChatMessageHandler(profile?.name.toString(), text)
+				}
 			}
-		 }
+		}
 
 		for (module in modules){
 			module.runInitFunction()

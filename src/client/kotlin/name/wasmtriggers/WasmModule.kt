@@ -8,6 +8,7 @@ import com.dylibso.chicory.runtime.Store
 import com.dylibso.chicory.wasi.WasiPreview1
 import com.dylibso.chicory.wasm.InvalidException
 import com.dylibso.chicory.wasm.UnlinkableException
+import name.wasmtriggers.hostFunctons.getChatFunctions
 import name.wasmtriggers.hostFunctons.getLoggingFunctions
 import java.io.File
 import java.nio.file.Files
@@ -29,13 +30,16 @@ class WasmModule(val instance: Instance, val name: String) {
 
             val store = Store()
 
+            val hostfunctions = getLoggingFunctions() + getChatFunctions()
+
             for (func in wasi.toHostFunctions()){
                 store.addFunction(func)
             }
-            for (func in getLoggingFunctions()){
+            for (func in hostfunctions){
                 WasmTriggers.logger.info("registering ${func.module()} ${func.name()}")
                 store.addFunction(func)
             }
+
 
             val instance = store.instantiate(file.name, module)
 
