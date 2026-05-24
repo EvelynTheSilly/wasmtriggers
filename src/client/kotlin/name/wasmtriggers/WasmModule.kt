@@ -95,6 +95,22 @@ class WasmModule(val instance: Instance, val name: String) {
             *message,
         )
     }
+    fun runKeyboardInputHandler() {
+        val keyHandler = wasmFunction("on_keyBoardInput") ?: return
+        keyHandler.apply()
+    }
+    fun runKeyPressHandler(key: Int) {
+        val keyHandler = wasmFunction("on_keypress") ?: return
+        keyHandler.apply()
+    }
+    fun runKeyReleaseHandler() {
+        val keyHandler = wasmFunction("on_keyrelease") ?: return
+        keyHandler.apply()
+    }
+    fun runKeyHoldHandler() {
+        val keyHandler = wasmFunction("on_keyHold") ?: return
+        keyHandler.apply()
+    }
 }
 
 fun loadModulesFolder(folder: Path): MutableList<WasmModule> {

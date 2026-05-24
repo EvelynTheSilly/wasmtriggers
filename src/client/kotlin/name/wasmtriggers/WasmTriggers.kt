@@ -1,5 +1,7 @@
 package name.wasmtriggers
 
+import name.wasmtriggers.event.KeyboardEvents
+import name.wasmtriggers.mixin.KeyboardMixin
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
@@ -35,6 +37,13 @@ object WasmTriggers : ClientModInitializer {
 			val text = component.string;
 			for (module in modules){
 				module.runServerMessageHandler(text)
+			}
+		}
+
+		KeyboardEvents.KEY_PRESS.register {handler, handle, action, event ->
+
+			for (module in modules){
+				module.runKeyboardInputHandler()
 			}
 		}
 
