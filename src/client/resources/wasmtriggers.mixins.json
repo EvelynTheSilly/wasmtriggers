@@ -1,0 +1,8 @@
+{
+    "required": true,
+    "package": "name.wasmtriggers.mixin",
+    "compatibilityLevel": "JAVA_21",
+    "client": [
+        "KeyboardMixin"
+    ]
+}
