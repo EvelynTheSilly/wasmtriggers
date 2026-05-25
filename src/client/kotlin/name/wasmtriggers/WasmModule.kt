@@ -10,6 +10,7 @@ import com.dylibso.chicory.wasm.InvalidException
 import com.dylibso.chicory.wasm.UnlinkableException
 import name.wasmtriggers.hostFunctons.getChatFunctions
 import name.wasmtriggers.hostFunctons.getLoggingFunctions
+import name.wasmtriggers.hostFunctons.getPlayerFunctions
 import net.minecraft.client.input.KeyEvent
 import java.io.File
 import java.nio.file.Files
@@ -31,7 +32,7 @@ class WasmModule(val instance: Instance, val name: String) {
 
             val store = Store()
 
-            val hostFunctions = getLoggingFunctions() + getChatFunctions()
+            val hostFunctions = getLoggingFunctions() + getChatFunctions() + getPlayerFunctions()
 
             for (func in wasi.toHostFunctions()){
                 store.addFunction(func)
@@ -103,7 +104,7 @@ class WasmModule(val instance: Instance, val name: String) {
         )
     }
     fun runKeyboardInputHandler(action: Int, key: String) {
-        val keyHandler = wasmFunction("on_keyboardInput") ?: return
+        val keyHandler = wasmFunction("on_keyboard_input") ?: return
         val keyAllocation = allocateString(key) ?: return
         keyHandler.apply(action.toLong(), *keyAllocation)
         freeString(keyAllocation)
