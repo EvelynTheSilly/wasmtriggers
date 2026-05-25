@@ -10,6 +10,7 @@ import com.dylibso.chicory.wasm.InvalidException
 import com.dylibso.chicory.wasm.UnlinkableException
 import name.wasmtriggers.hostFunctons.getChatFunctions
 import name.wasmtriggers.hostFunctons.getLoggingFunctions
+import net.minecraft.client.input.KeyEvent
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -50,7 +51,7 @@ class WasmModule(val instance: Instance, val name: String) {
         return try {
             instance.export(name)
         }catch (e: InvalidException){
-            WasmTriggers.logger.info("$e")
+            WasmTriggers.logger.info("${this.name} has no function $name")
             null
         }
     }
@@ -69,6 +70,12 @@ class WasmModule(val instance: Instance, val name: String) {
         }
         this.instance.memory().writeString(ptr.toInt(), string)
         return longArrayOf(ptr, len)
+    }
+    fun freeString(string: LongArray){
+        val free = wasmFunction("dealloc")
+        val ptr = string[0]
+        val len = string[1]
+        free?.apply(ptr, len)
     }
     fun runInitFunction() {
         WasmTriggers.logger.info("initialising ${this.name}")
@@ -95,21 +102,35 @@ class WasmModule(val instance: Instance, val name: String) {
             *message,
         )
     }
-    fun runKeyboardInputHandler() {
-        val keyHandler = wasmFunction("on_keyBoardInput") ?: return
-        keyHandler.apply()
+    fun runKeyboardInputHandler(action: Int, key: String) {
+        val keyHandler = wasmFunction("on_keyboardInput") ?: return
+        val keyAllocation = allocateString(key) ?: return
+        keyHandler.apply(action.toLong(), *keyAllocation)
+        freeString(keyAllocation)
     }
-    fun runKeyPressHandler(key: Int) {
-        val keyHandler = wasmFunction("on_keypress") ?: return
-        keyHandler.apply()
+    fun runKeyPressHandler(key: String) {
+        val keyHandler = wasmFunction("on_keypress")
+        val specificKeyHandler = wasmFunction("on_keypress_${key}")
+        val keyAllocation = allocateString(key) ?: return
+        keyHandler?.apply(*keyAllocation)
+        specificKeyHandler?.apply()
+        freeString(keyAllocation)
     }
-    fun runKeyReleaseHandler() {
-        val keyHandler = wasmFunction("on_keyrelease") ?: return
-        keyHandler.apply()
+    fun runKeyReleaseHandler(key: String) {
+        val keyHandler = wasmFunction("on_keyrelease")
+        val specificKeyHandler = wasmFunction("on_keyrelease_${key}")
+        val keyAllocation = allocateString(key) ?: return
+        keyHandler?.apply(*keyAllocation)
+        specificKeyHandler?.apply()
+        freeString(keyAllocation)
     }
-    fun runKeyHoldHandler() {
-        val keyHandler = wasmFunction("on_keyHold") ?: return
-        keyHandler.apply()
+    fun runKeyHoldHandler(key: String) {
+        val keyHandler = wasmFunction("on_keyhold")
+        val specificKeyHandler = wasmFunction("on_keyhold_${key}")
+        val keyAllocation = allocateString(key) ?: return
+        keyHandler?.apply(*keyAllocation)
+        specificKeyHandler?.apply()
+        freeString(keyAllocation)
     }
 }
 

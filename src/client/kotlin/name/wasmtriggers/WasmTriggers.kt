@@ -1,11 +1,10 @@
 package name.wasmtriggers
 
 import name.wasmtriggers.event.KeyboardEvents
-import name.wasmtriggers.mixin.KeyboardMixin
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
-import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
 import net.fabricmc.loader.api.FabricLoader
+import org.lwjgl.glfw.GLFW
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -41,9 +40,20 @@ object WasmTriggers : ClientModInitializer {
 		}
 
 		KeyboardEvents.KEY_PRESS.register {handler, handle, action, event ->
+			val event = event ?: return@register
+            val keyName = GLFW.glfwGetKeyName(event.key, event.scancode) ?: return@register
 
-			for (module in modules){
-				module.runKeyboardInputHandler()
+            for (module in modules){
+				if (action == GLFW.GLFW_PRESS){
+					module.runKeyPressHandler(keyName)
+				}
+				if (action == GLFW.GLFW_RELEASE){
+					module.runKeyReleaseHandler(keyName)
+				}
+				if (action == GLFW.GLFW_REPEAT){
+					module.runKeyHoldHandler(keyName)
+				}
+				module.runKeyboardInputHandler(action, keyName)
 			}
 		}
 
