@@ -52,7 +52,7 @@ class WasmModule(val instance: Instance, val name: String) {
         return try {
             instance.export(name)
         }catch (e: InvalidException){
-            WasmTriggers.logger.info("${this.name} has no function $name")
+            // WasmTriggers.logger.info("${this.name} has no function $name")
             null
         }
     }
