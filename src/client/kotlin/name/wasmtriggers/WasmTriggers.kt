@@ -4,9 +4,11 @@ import name.wasmtriggers.event.KeyboardEvents
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 
 object WasmTriggers : ClientModInitializer {
 	const val MOD_ID = "wasmtriggers"
@@ -42,6 +44,13 @@ object WasmTriggers : ClientModInitializer {
 		KeyboardEvents.KEY_PRESS.register {handler, handle, action, event ->
 			val event = event ?: return@register
             val keyName = GLFW.glfwGetKeyName(event.key, event.scancode) ?: return@register
+
+			val client = Minecraft.getInstance()
+			val isInGui = client.screen != null
+
+			if (isInGui) {
+				return@register
+			}
 
             for (module in modules){
 				if (action == GLFW.GLFW_PRESS){
