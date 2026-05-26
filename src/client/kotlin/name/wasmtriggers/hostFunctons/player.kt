@@ -17,27 +17,19 @@ fun getPlayerFunctions(): Array<HostFunction>{
     ) { instance, args ->
         val coordinates = Minecraft.getInstance().player?.blockPosition()
         if (coordinates == null){
-            instance.memory().write(args[0].toInt(), 0.toByteArray())
-            instance.memory().write(args[1].toInt(), 0.toByteArray())
-            instance.memory().write(args[2].toInt(), 0.toByteArray())
-            instance.memory().write(args[3].toInt(), 0.toByteArray())
+            instance.memory().writeI32(args[0].toInt(), 0)
+            instance.memory().writeI32(args[1].toInt(), 0)
+            instance.memory().writeI32(args[2].toInt(), 0)
+            instance.memory().writeI32(args[3].toInt(), 0)
         }
         else {
-            WasmTriggers.logger.info("${coordinates.x}, ${coordinates.y}, ${coordinates.z}")
-            instance.memory().write(args[0].toInt(), 1.toByteArray())
-            instance.memory().write(args[1].toInt(), coordinates.x.toByteArray())
-            instance.memory().write(args[2].toInt(), coordinates.y.toByteArray())
-            instance.memory().write(args[3].toInt(), coordinates.z.toByteArray())
+            instance.memory().writeI32(args[0].toInt(), 1)
+            instance.memory().writeI32(args[1].toInt(), coordinates.x)
+            instance.memory().writeI32(args[2].toInt(), coordinates.y)
+            instance.memory().writeI32(args[3].toInt(), coordinates.z)
         }
 
         null
     }
     return arrayOf(getPlayerBlockPosition)
 }
-
-fun Int.toByteArray(): ByteArray = byteArrayOf(
-    this.toByte(),
-    (this shr 8).toByte(),
-    (this shr 16).toByte(),
-    (this shr 24).toByte()
-)
