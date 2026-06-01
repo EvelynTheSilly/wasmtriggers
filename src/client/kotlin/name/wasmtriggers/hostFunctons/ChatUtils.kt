@@ -6,12 +6,9 @@ import com.dylibso.chicory.wasm.types.FunctionType
 import com.dylibso.chicory.wasm.types.ValType
 import name.wasmtriggers.WasmTriggers
 import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.ClickEvent
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.HoverEvent
-import net.minecraft.network.chat.Style
-import net.minecraft.network.chat.TextColor
+import net.minecraft.network.chat.*
 import java.net.URI
+
 
 fun getChatFunctions(): Array<HostFunction>{
     val showChat = HostFunction(
@@ -71,7 +68,47 @@ fun getChatFunctions(): Array<HostFunction>{
 
         null
     }
-    return arrayOf(showChat, sendChat, sendCommand)
+    val setTitle = HostFunction(
+        "chat_lib",
+        "set_title",
+        FunctionType.of(
+            listOf(ValType.I32, ValType.I32),
+            listOf()
+        ),
+    ) { instance, args ->
+        val offset = args[0].toInt()
+        val len = args[1].toInt()
+
+        val memory = instance.memory()
+        val message = readChatComponentsFromMemory(memory, offset, len) ?: return@HostFunction null
+
+        val client = Minecraft.getInstance()
+
+        client.gui.setTitle(message)
+
+        null
+    }
+    val setSubTitle= HostFunction(
+        "chat_lib",
+        "set_sub_title",
+        FunctionType.of(
+            listOf(ValType.I32, ValType.I32),
+            listOf()
+        ),
+    ) { instance, args ->
+        val offset = args[0].toInt()
+        val len = args[1].toInt()
+
+        val memory = instance.memory()
+        val message = readChatComponentsFromMemory(memory, offset, len) ?: return@HostFunction null
+
+        val client = Minecraft.getInstance()
+
+        client.gui.setSubtitle(message)
+
+        null
+    }
+    return arrayOf(showChat, sendChat, sendCommand, setTitle, setSubTitle)
 }
 
 fun readChatComponentsFromMemory(memory: Memory, offset: Int, len: Int): Component? {
