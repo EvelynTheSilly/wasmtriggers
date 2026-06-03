@@ -22,6 +22,7 @@ object WasmTriggers : ClientModInitializer {
 		logger.info("grabbing modules from $wasmDir")
 
 		modules = loadModulesFolder(wasmDir)
+		registerCliFunctionality()
 
 		ClientReceiveMessageEvents.CHAT.register { component, message, profile, bound, instant ->
 			val text = message?.decoratedContent()?.string;
