@@ -1,4 +1,4 @@
-package name.wasmtriggers
+package name.wasmtriggers.cli
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -10,6 +10,8 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Style
+import name.wasmtriggers.WasmModule
+import name.wasmtriggers.WasmTriggers
 import java.nio.file.Files
 import kotlin.io.path.name
 import kotlin.io.path.nameWithoutExtension
@@ -21,18 +23,21 @@ fun registerCliFunctionality() {
         val unload = ClientCommandManager.literal("unload")
             .then(
                 ClientCommandManager.argument("name", StringArgumentType.word())
+                    .suggests(suggestLoadedModules())
                     .executes { ctx -> unloadModule(ctx) }
             )
 
         val load = ClientCommandManager.literal("load")
             .then(
                 ClientCommandManager.argument("name", StringArgumentType.word())
+                    .suggests(suggestUnloadedModules())
                     .executes { ctx -> loadModule(ctx) }
             )
 
         val reload = ClientCommandManager.literal("reload")
             .then(
                 ClientCommandManager.argument("name", StringArgumentType.word())
+                    .suggests(suggestAllModules())
                     .executes { ctx -> reloadModule(ctx) }
             )
             .executes { ctx -> reloadAllModules(ctx) }

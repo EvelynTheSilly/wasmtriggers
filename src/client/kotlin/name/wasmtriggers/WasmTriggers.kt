@@ -9,6 +9,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
+import name.wasmtriggers.cli.registerCliFunctionality
+
 object WasmTriggers : ClientModInitializer {
     const val MOD_ID = "wasmtriggers"
     val logger: Logger = LoggerFactory.getLogger(MOD_ID)
