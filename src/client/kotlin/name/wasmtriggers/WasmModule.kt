@@ -8,6 +8,7 @@ import com.dylibso.chicory.runtime.Store
 import com.dylibso.chicory.wasi.WasiPreview1
 import com.dylibso.chicory.wasm.InvalidException
 import com.dylibso.chicory.wasm.UnlinkableException
+import com.dylibso.chicory.wasm.types.ExternalType
 import name.wasmtriggers.hostFunctons.getChatFunctions
 import name.wasmtriggers.hostFunctons.getLoggingFunctions
 import name.wasmtriggers.hostFunctons.getPlayerFunctions
@@ -55,6 +56,15 @@ class WasmModule(val instance: Instance, val name: String) {
             // WasmTriggers.logger.info("${this.name} has no function $name")
             null
         }
+    }
+    fun getAllHandlers(base: String): Array<ExportFunction> {
+        val exports = instance.module().exportSection()
+        return (0 until exports.exportCount())
+            .map { exports.getExport(it) }
+            .filter { it.exportType() == ExternalType.FUNCTION }
+            .filter { it.name().startsWith("${base}__") }
+            .map { instance.export(it.name()) }
+            .toTypedArray()
     }
 
     /**
