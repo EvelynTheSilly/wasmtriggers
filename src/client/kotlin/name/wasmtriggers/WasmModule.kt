@@ -12,7 +12,6 @@ import com.dylibso.chicory.wasm.types.ExternalType
 import name.wasmtriggers.hostFunctons.getChatFunctions
 import name.wasmtriggers.hostFunctons.getLoggingFunctions
 import name.wasmtriggers.hostFunctons.getPlayerFunctions
-import net.minecraft.client.input.KeyEvent
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -90,57 +89,73 @@ class WasmModule(val instance: Instance, val name: String) {
     }
     fun runInitFunction() {
         WasmTriggers.logger.info("initialising ${this.name}")
-        val function = this.wasmFunction("init_handler")
-        if (function == null) {
-            WasmTriggers.logger.warn("module has no init_handler")
-            return
+        val functions = this.getAllHandlers("init_handler")
+        for (function in functions){
+            function.apply()
         }
-        function.apply()
     }
     fun runChatMessageHandler(playerName: String, message: String){
-        val chatMessageHandler = wasmFunction("chat_message_handler") ?: return
+        val handlers = getAllHandlers("chat_message_handler")
         val playerName = this.allocateString(playerName) ?: return
         val message = this.allocateString(message) ?: return
-        chatMessageHandler.apply(
-            *playerName,
-            *message,
-        )
+        for (handler in handlers) {
+            handler.apply(
+                *playerName,
+                *message,
+            )
+        }
     }
     fun runServerMessageHandler(message: String){
-        val serverMessageHandler = wasmFunction("server_message_handler") ?: return
+        val handlers = getAllHandlers("server_message_handler")
         val message = this.allocateString(message) ?: return
-        serverMessageHandler.apply(
-            *message,
-        )
+        for (handler in handlers) {
+            handler.apply(
+                *message,
+            )
+        }
     }
     fun runKeyboardInputHandler(action: Int, key: String) {
-        val keyHandler = wasmFunction("on_keyboard_input") ?: return
+        val handlers = getAllHandlers("on_keyboard_input")
         val keyAllocation = allocateString(key) ?: return
-        keyHandler.apply(action.toLong(), *keyAllocation)
+        for (handler in handlers) {
+            handler.apply(action.toLong(), *keyAllocation)
+        }
         freeString(keyAllocation)
     }
     fun runKeyPressHandler(key: String) {
-        val keyHandler = wasmFunction("on_keypress")
-        val specificKeyHandler = wasmFunction("on_keypress_${key}")
+        val handlers = getAllHandlers("on_keypress")
+        val specificHandlers = getAllHandlers("on_keypress_${key}")
         val keyAllocation = allocateString(key) ?: return
-        keyHandler?.apply(*keyAllocation)
-        specificKeyHandler?.apply()
+        for (handler in handlers) {
+            handler.apply(*keyAllocation)
+        }
+        for (handler in specificHandlers) {
+            handler.apply()
+        }
         freeString(keyAllocation)
     }
     fun runKeyReleaseHandler(key: String) {
-        val keyHandler = wasmFunction("on_keyrelease")
-        val specificKeyHandler = wasmFunction("on_keyrelease_${key}")
+        val handlers = getAllHandlers("on_keyrelease")
+        val specificHandlers = getAllHandlers("on_keyrelease_${key}")
         val keyAllocation = allocateString(key) ?: return
-        keyHandler?.apply(*keyAllocation)
-        specificKeyHandler?.apply()
+        for (handler in handlers) {
+            handler.apply(*keyAllocation)
+        }
+        for (handler in specificHandlers) {
+            handler.apply()
+        }
         freeString(keyAllocation)
     }
     fun runKeyHoldHandler(key: String) {
-        val keyHandler = wasmFunction("on_keyhold")
-        val specificKeyHandler = wasmFunction("on_keyhold_${key}")
+        val handlers = getAllHandlers("on_keyhold")
+        val specificHandlers = getAllHandlers("on_keyhold_${key}")
         val keyAllocation = allocateString(key) ?: return
-        keyHandler?.apply(*keyAllocation)
-        specificKeyHandler?.apply()
+        for (handler in handlers) {
+            handler.apply(*keyAllocation)
+        }
+        for (handler in specificHandlers) {
+            handler.apply()
+        }
         freeString(keyAllocation)
     }
 }
