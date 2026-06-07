@@ -3,6 +3,7 @@ package name.wasmtriggers
 import name.wasmtriggers.triggers.registerChatHandler
 import name.wasmtriggers.triggers.registerGameMessageHandler
 import name.wasmtriggers.triggers.registerKeyboardHandler
+import name.wasmtriggers.triggers.registerTickHandler
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.loader.api.FabricLoader
 import org.slf4j.Logger
@@ -28,6 +29,7 @@ object WasmTriggers : ClientModInitializer {
         registerChatHandler()
         registerGameMessageHandler()
         registerKeyboardHandler()
+        registerTickHandler()
 
         for (module in modules) {
             module.runInitFunction()

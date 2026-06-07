@@ -94,6 +94,12 @@ class WasmModule(val instance: Instance, val name: String) {
             function.apply()
         }
     }
+    fun runTickHandler(tick: Long) {
+        val functions = this.getAllHandlers("on_tick")
+        for (function in functions) {
+            function.apply(tick)
+        }
+    }
     fun runChatMessageHandler(playerName: String, message: String){
         val handlers = getAllHandlers("chat_message_handler")
         val playerName = this.allocateString(playerName) ?: return
