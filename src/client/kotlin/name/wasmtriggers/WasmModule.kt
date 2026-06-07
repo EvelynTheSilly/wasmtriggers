@@ -62,7 +62,7 @@ class WasmModule(val instance: Instance, val name: String) {
         return (0 until exports.exportCount())
             .map { exports.getExport(it) }
             .filter { it.exportType() == ExternalType.FUNCTION }
-            .filter { it.name().startsWith("${base}__") }
+            .filter { it.name().startsWith("${base}__") || it.name() == base }
             .map { instance.export(it.name()) }
             .toTypedArray()
     }
