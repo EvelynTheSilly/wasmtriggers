@@ -1,4 +1,4 @@
-package name.wasmtriggers.hostFunctons
+package name.wasmtriggers.hostFunctions
 
 import com.dylibso.chicory.runtime.HostFunction
 import com.dylibso.chicory.runtime.Instance

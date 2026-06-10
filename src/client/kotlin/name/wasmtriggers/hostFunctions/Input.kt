@@ -1,11 +1,9 @@
-package name.wasmtriggers.hostFunctons
+package name.wasmtriggers.hostFunctions
 
 import com.dylibso.chicory.runtime.HostFunction
 import com.dylibso.chicory.wasm.types.FunctionType
 import com.dylibso.chicory.wasm.types.ValType
 import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.Component
-import org.lwjgl.glfw.GLFW
 
 fun getInputFunctions(): Array<HostFunction>{
     val showChat = HostFunction(

@@ -1,9 +1,8 @@
-package name.wasmtriggers.hostFunctons
+package name.wasmtriggers.hostFunctions
 
 import com.dylibso.chicory.runtime.HostFunction
 import com.dylibso.chicory.wasm.types.FunctionType
 import com.dylibso.chicory.wasm.types.ValType
-import name.wasmtriggers.WasmTriggers
 import net.minecraft.client.Minecraft
 
 fun getPlayerFunctions(): Array<HostFunction>{

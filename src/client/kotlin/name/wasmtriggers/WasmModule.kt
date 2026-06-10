@@ -9,9 +9,9 @@ import com.dylibso.chicory.wasi.WasiPreview1
 import com.dylibso.chicory.wasm.InvalidException
 import com.dylibso.chicory.wasm.UnlinkableException
 import com.dylibso.chicory.wasm.types.ExternalType
-import name.wasmtriggers.hostFunctons.getChatFunctions
-import name.wasmtriggers.hostFunctons.getLoggingFunctions
-import name.wasmtriggers.hostFunctons.getPlayerFunctions
+import name.wasmtriggers.hostFunctions.getChatFunctions
+import name.wasmtriggers.hostFunctions.getLoggingFunctions
+import name.wasmtriggers.hostFunctions.getPlayerFunctions
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
