@@ -2,7 +2,7 @@ package name.wasmtriggers.cli
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.fabricmc.loader.api.FabricLoader
@@ -18,31 +18,31 @@ import kotlin.io.path.nameWithoutExtension
 
 fun registerCliFunctionality() {
     ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-        val wt = ClientCommandManager.literal("wt")
+        val wt = ClientCommands.literal("wt")
 
-        val unload = ClientCommandManager.literal("unload")
+        val unload = ClientCommands.literal("unload")
             .then(
-                ClientCommandManager.argument("name", StringArgumentType.word())
+                ClientCommands.argument("name", StringArgumentType.word())
                     .suggests(suggestLoadedModules())
                     .executes { ctx -> unloadModule(ctx) }
             )
 
-        val load = ClientCommandManager.literal("load")
+        val load = ClientCommands.literal("load")
             .then(
-                ClientCommandManager.argument("name", StringArgumentType.word())
+                ClientCommands.argument("name", StringArgumentType.word())
                     .suggests(suggestUnloadedModules())
                     .executes { ctx -> loadModule(ctx) }
             )
 
-        val reload = ClientCommandManager.literal("reload")
+        val reload = ClientCommands.literal("reload")
             .then(
-                ClientCommandManager.argument("name", StringArgumentType.word())
+                ClientCommands.argument("name", StringArgumentType.word())
                     .suggests(suggestAllModules())
                     .executes { ctx -> reloadModule(ctx) }
             )
             .executes { ctx -> reloadAllModules(ctx) }
 
-        val list = ClientCommandManager.literal("list")
+        val list = ClientCommands.literal("list")
             .executes { ctx -> listModules(ctx) }
 
         dispatcher.register(wt.then(unload).then(load).then(reload).then(list))

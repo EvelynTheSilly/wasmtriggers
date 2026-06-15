@@ -27,9 +27,8 @@ fun getChatFunctions(): Array<HostFunction>{
 
         WasmTriggers.logger.info("logging $message")
 
-        Minecraft.getInstance().player?.displayClientMessage(
-            message,
-            false
+        Minecraft.getInstance().player?.sendSystemMessage(
+            message
         )
 
         null
